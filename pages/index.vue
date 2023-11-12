@@ -59,7 +59,7 @@
       <div class="flex">
         <button
           class="w-12 h-12 flex-center rounded-1 text-gray-400 transition-colors hover:(text-gray-600 dark:text-gray-200) disabled:(text-gray-400 cursor-not-allowed)"
-          @click="startTimer" :disabled="!isPause">
+          @click="startTimer" :disabled="!isPause && isCounting">
           <Icon name="fa6-solid:play" class="text-xl dark:text-600" />
         </button>
         <button
