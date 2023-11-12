@@ -74,14 +74,14 @@
     <div ref="minDial"
       class="absolute -z-10 left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
       <div v-for="(num, idx) in zeroToSixty.slice(TOMATO, TOMATO+1).concat(zeroToSixty.slice(0, TOMATO))" :key="idx"
-        class="absolute left-[50%] top-[50%] w-55 text-gray-300 text-right select-none transition transform -translate-y-[50%] origin-left rotate-6"
+        class="absolute left-[50%] top-[50%] w-65 <lg:w-55 text-gray-300 text-right select-none transition transform -translate-y-[50%] origin-left rotate-6"
         :class="isMinuteDivActive(idx) ? 'font-bold text-black dark:text-gray-200' : 'text-gray-200 dark:text-gray-600'"
         :style="`--tw-rotate: ${(idx) * minTomatoDeg()}deg`">
         {{ num }}
       </div>
     </div>
     <div ref="minText" class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
-      <div class="relative left-[280%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? minuteOrMinutes : "分鐘" }}</div>
+      <div class="relative left-[320%] <lg:left-[280%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? minuteOrMinutes : "分鐘" }}</div>
     </div>
 
     <!-- Second -->
@@ -95,7 +95,7 @@
       </div>
     </div>
     <div ref="secText" class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
-      <div class="relative left-[510%] <lg:left-[450%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? secondOrSeconds : "秒鐘" }}</div>
+      <div class="relative left-[502%] <lg:left-[450%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? secondOrSeconds : "秒鐘" }}</div>
     </div>
   </div>
 </template>
