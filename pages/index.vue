@@ -7,12 +7,16 @@
       <RoundBtn @click="switchFocus" :isActivated="isFocus"><Icon name="uil:focus-target" class="text-md dark:text-600" /></RoundBtn>
       <RoundBtn @click="switchLanguage" :isActivated="isChinese()"><Icon name="uil:english-to-chinese" class="text-md dark:text-600" /></RoundBtn>
       <RoundBtn @click="switchConsoleShow" :isActivated="isConsoleShow"><Icon name="uil:brackets-curly" class="text-md dark:text-600" /></RoundBtn>
+      <RoundBtn @click="switchNoteShow" :isActivated="isNoteShow"><Icon name="uil:lightbulb-alt" class="text-md dark:text-600" /></RoundBtn>
       <hr />
-      <RoundBtn :isActivated="false"><NuxtLink to="/about">
+      <!-- <RoundBtn :isActivated="false"><NuxtLink to="/about">
         <Icon name="uil:lightbulb-alt" class="text-md dark:text-600" /></NuxtLink>
-      </RoundBtn>
+      </RoundBtn> -->
       <RoundBtn :isActivated="false"><NuxtLink to="https://github.com/paperplane110/FocusTimer" target="_blank">
         <Icon name="uil:github-alt" class="text-md dark:text-600" /></NuxtLink>
+      </RoundBtn>
+      <RoundBtn :isActivated="false"><NuxtLink to="https://tyyuan110.com" target="_blank">
+        <Icon name="uil:user" class="text-md dark:text-600" /></NuxtLink>
       </RoundBtn>
     </div>
 
@@ -27,6 +31,7 @@
       <p>isTomato: {{ isTomato }}</p>
       <br />
       <p class="text-2xl">Timestamps</p>
+      <p>nowTimeStamp: {{ nowTimeStamp }}</p>
       <p>startTimeStamp: {{ startTimeStamp }}</p>
       <p>pauseTimeStamp: {{ pauseTimeStamp }}</p>
       <p>dt: {{ dt }}</p>
@@ -54,7 +59,7 @@
       <div class="flex">
         <button
           class="w-12 h-12 flex-center rounded-1 text-gray-400 transition-colors hover:(text-gray-600 dark:text-gray-200) disabled:(text-gray-400 cursor-not-allowed)"
-          @click="startTimer">
+          @click="startTimer" :disabled="!isPause">
           <Icon name="fa6-solid:play" class="text-xl dark:text-600" />
         </button>
         <button
@@ -97,6 +102,13 @@
     <div ref="secText" class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
       <div class="relative left-[502%] <lg:left-[450%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? secondOrSeconds : "秒鐘" }}</div>
     </div>
+
+    <!-- note -->
+    <Transition>
+      <V1Release ref="v1Note" v-show="isNoteShow" class="absolute bg-light-100 right-[8rem] top-[50vh] transform -translate-y-[50%]"
+        :minString="formatCountdown().min" :secString="formatCountdown().sec"
+      />
+    </Transition>
   </div>
 </template>
 
@@ -141,6 +153,8 @@ const minDeg = 6
 const minTomatoDeg = () => 360/(TOMATO.value+1)
 const secDial = ref()
 const secDeg = 6
+
+const v1Note = ref()
 
 // timer state
 const isCounting = ref(false)
@@ -294,12 +308,19 @@ watch(isTomato, (newTomato) => {
 // Panel state
 const isConsoleShow = ref(false)
 const switchConsoleShow = () => isConsoleShow.value = !isConsoleShow.value
+
 const isChinese = () => lang.value === "zh" ? true : false
 const switchLanguage = () => {
   if (lang.value === "zh") lang.value = "en"
   else lang.value = "zh"
 }
 
+const isNoteShow = ref(false)
+const switchNoteShow = () => {
+  isNoteShow.value = !isNoteShow.value
+  if (!isFocus.value) switchFocus()
+  // if (isNoteShow.value) Draggable.create(v1Note.value)
+}
 
 // Focus
 const isFocus = ref(false)
@@ -312,6 +333,7 @@ const switchFocus = () => {
     tween.play()
   } else {
     console.log("un-focus")
+    if (isNoteShow.value) switchNoteShow()
     tween.reverse()
   }
   isFocus.value = !isFocus.value
@@ -320,6 +342,7 @@ const switchFocus = () => {
 
 
 onMounted(() => {
+  // gsap.registerPlugin(Draggable)
   const timerRefGroup = [
     knob.value,
     minDial.value, minText.value,
@@ -358,5 +381,21 @@ onMounted(() => {
 }
 
 .shadow-xlc-orange {
-  box-shadow: 0 0 34px 6px rgba(255, 204, 35, 0.2)}
+  box-shadow: 0 0 34px 6px rgba(255, 204, 35, 0.2)
+}
+
+.v-enter-active
+{
+  transition: opacity 0.6s ease;
+  transition-delay: 100ms;
+}
+
+.v-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 </style>
