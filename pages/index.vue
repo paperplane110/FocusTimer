@@ -43,6 +43,8 @@
       <p>accumulate sec: {{ accumSec }}</p>
       <p>accumulate min: {{ accumMin }}</p>
       <br />
+      <p class="text-2xl">Others</p>
+      <p>Second Dial Delta Degree: {{ secDeltaDeg }}</p>
     </div>
 
     <!-- Knob -->
@@ -153,6 +155,10 @@ const minDeg = 6
 const minTomatoDeg = () => 360/(TOMATO.value+1)
 const secDial = ref()
 const secDeg = 6
+// Record the offset of the sec dial after reset
+// Each time after the reset button pressed,
+// sec dial won't go all the way back, but only back to the nearest zero tick.
+const secDeltaDeg = ref(0)
 
 const v1Note = ref()
 
@@ -212,15 +218,15 @@ watch(elapseMs, () => {
     dMin = 0.2
   }
 
-  rDial(secDial, secDeg, accumSec.value, dSec, ease)
-  rDial(minDial, minTomatoDeg(), accumMin.value, dSec, ease)
+  rDial(secDial, secDeg * accumSec.value + secDeltaDeg.value, dSec, ease)
+  rDial(minDial, minTomatoDeg() * accumMin.value, dSec, ease)
   lastAccumSec.value = accumSec.value
   lastAccumMin.value = accumMin.value
 })
 
-const rDial = (dialRef: Ref, per: number, accum: number, d: number, ease = "power1.out") => {
+const rDial = (dialRef: Ref, degrees: number, d: number, ease = "power1.out") => {
   gsap.to(dialRef.value, {
-    rotation: per * accum,
+    rotation: degrees,
     duration: d,
     ease: ease,
   })
@@ -256,6 +262,9 @@ const resetTimer = () => {
   if (!isPause.value) {
     pauseTimer()
   }
+  // sec dial won't go back to the very beginning
+  secDeltaDeg.value += Math.floor((secDeg * accumSec.value) / 360) * 360
+
   // wait for the last tick
   setTimeout(() => {
     startTimeStamp.value = 0
