@@ -1,5 +1,5 @@
 <template>
-  <div class="w-640px <sm:max-w-95vw max-h-[90vh] border rounded-2xl px-8 py-10 overflow-scroll">
+  <div class="w-640px <sm:max-w-95vw max-h-[90vh] border dark:border-gray-600 rounded-2xl px-8 py-10 overflow-scroll">
     <!-- Title -->
     <div class="flex justify-between items-end">
       <div class="text-4xl mb-2">Focus Timer v1.0</div>

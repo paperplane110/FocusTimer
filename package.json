@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@nuxtjs/color-mode": "^3.3.2",
     "nuxt": "^3.8.1",
     "nuxt-icon": "^0.6.5",
     "nuxt-windicss": "^2.6.1",

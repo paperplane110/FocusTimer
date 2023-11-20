@@ -1,29 +1,47 @@
 <template>
-  <div class="relative flex flex-col min-w-screen min-h-screen overflow-hidden">
+  <div class="relative flex flex-col min-w-screen min-h-screen overflow-hidden transition-colors dark:bg-dark-900"
+    @keydown.esc="escDown">
     <!-- Panel -->
-    <div class="absolute right-[2rem] top-[50vh] bg-light-100 border rounded-full px-4 py-4 grid grid-cols-1 gap-4 transform -translate-y-[50%]
+    <div class="absolute right-[2rem] top-[50vh] bg-light-100 border dark:(bg-dark-600 border-gray-600) rounded-full px-4 py-4 grid grid-cols-1 gap-4 transform -translate-y-[50%]
       <lg:(right-[50vw] bottom-[2rem] top-auto flex translate-y-0 translate-x-[50%])
     ">
-      <RoundBtn @click="switchFocus" :isActivated="isFocus"><Icon name="uil:focus-target" class="text-md dark:text-600" /></RoundBtn>
-      <RoundBtn @click="switchLanguage" :isActivated="isChinese()"><Icon name="uil:english-to-chinese" class="text-md dark:text-600" /></RoundBtn>
-      <RoundBtn @click="switchConsoleShow" :isActivated="isConsoleShow"><Icon name="uil:brackets-curly" class="text-md dark:text-600" /></RoundBtn>
-      <RoundBtn @click="switchNoteShow" :isActivated="isNoteShow"><Icon name="uil:lightbulb-alt" class="text-md dark:text-600" /></RoundBtn>
+      <RoundBtn @click="switchColorMode" :isActivated="colorMode.value === 'dark'">
+        <Icon name="uil:moon" class="text-md dark:text-600" />
+      </RoundBtn>
+      <RoundBtn @click="switchFocus" :isActivated="isFocus">
+        <Icon name="uil:focus-target" class="text-md dark:text-600" />
+      </RoundBtn>
+      <RoundBtn @click="switchLanguage" :isActivated="isChinese()">
+        <Icon name="uil:english-to-chinese" class="text-md dark:text-600" />
+      </RoundBtn>
+      <RoundBtn @click="switchConsoleShow" :isActivated="isConsoleShow">
+        <Icon name="uil:brackets-curly" class="text-md dark:text-600" />
+      </RoundBtn>
+      <RoundBtn @click="switchNoteShow" :isActivated="isNoteShow">
+        <Icon name="uil:lightbulb-alt" class="text-md dark:text-600" />
+      </RoundBtn>
       <hr />
       <!-- <RoundBtn :isActivated="false"><NuxtLink to="/about">
         <Icon name="uil:lightbulb-alt" class="text-md dark:text-600" /></NuxtLink>
       </RoundBtn> -->
-      <RoundBtn :isActivated="false"><NuxtLink to="https://github.com/paperplane110/FocusTimer" target="_blank">
-        <Icon name="uil:github-alt" class="text-md dark:text-600" /></NuxtLink>
+      <RoundBtn :isActivated="false">
+        <NuxtLink to="https://github.com/paperplane110/FocusTimer" target="_blank">
+          <Icon name="uil:github-alt" class="text-md dark:text-600" />
+        </NuxtLink>
       </RoundBtn>
-      <RoundBtn :isActivated="false"><NuxtLink to="https://tyyuan110.com" target="_blank">
-        <Icon name="uil:user" class="text-md dark:text-600" /></NuxtLink>
+      <RoundBtn :isActivated="false">
+        <NuxtLink to="https://tyyuan110.com" target="_blank">
+          <Icon name="uil:user" class="text-md dark:text-600" />
+        </NuxtLink>
       </RoundBtn>
     </div>
 
-    <div v-show="isConsoleShow" class="absolute right-[8rem] top-[50vh] bg-light-100 border rounded-2xl px-8 py-4 transform -translate-y-[50%]">
+    <div v-show="isConsoleShow"
+      class="absolute right-[8rem] top-[50vh] bg-light-100 dark:(text-gray-200 bg-gray-100/10) border rounded-2xl px-8 py-4 transform -translate-y-[50%]">
       <p class="text-4xl">Console</p>
       <br />
       <p class="text-2xl">Language: {{ lang }}</p>
+      <p>ColorMode.value: {{ colorMode.value }}</p>
       <br />
       <p class="text-2xl">Timer state</p>
       <p>isCounting: {{ isCounting }}</p>
@@ -48,15 +66,12 @@
     </div>
 
     <!-- Knob -->
-    <div
-      ref="knob"
-      class="absolute z-10 left-[50vw] top-[50vh]
+    <div ref="knob" class="absolute z-15 left-[50vw] top-[50vh]
       flex flex-col justify-center items-center
       border rounded-1
       w-200px h-200px
       transform -translate-x-[50%] -translate-y-[50%] transition-shadow"
-      :class="[isTomato ? 'shadow-xlc-red' : isPause? 'shadow-xlc-orange' : 'shadow-xlc-green']"
-    >
+      :class="[isTomato ? 'shadow-xlc-red' : isPause ? 'shadow-xlc-orange' : 'shadow-xlc-green']">
       <p class="text-gray-400 text-3xl font-thin select-none">{{ formatCountdown().min }}:{{ formatCountdown().sec }}</p>
       <div class="flex">
         <button
@@ -79,21 +94,26 @@
 
     <!-- Minute -->
     <div ref="minDial"
-      class="absolute -z-10 left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
-      <div v-for="(num, idx) in zeroToSixty.slice(TOMATO, TOMATO+1).concat(zeroToSixty.slice(0, TOMATO))" :key="idx"
+      class="absolute z-10 left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
+      <div v-for="(num, idx) in zeroToSixty.slice(TOMATO, TOMATO + 1).concat(zeroToSixty.slice(0, TOMATO))" :key="idx"
         class="absolute left-[50%] top-[50%] w-65 <lg:w-55 text-gray-300 text-right select-none transition transform -translate-y-[50%] origin-left rotate-6"
-        :class="isMinuteDivActive(idx) ? 'font-bold text-black dark:text-gray-200' : 'text-gray-200 dark:text-gray-600'"
-        :style="`--tw-rotate: ${(idx) * minTomatoDeg()}deg`">
+        :class="[
+          isMinuteDivActive(idx) ? 'font-bold text-black dark:text-gray-200' : 'text-gray-200 dark:text-gray-600'
+        ]" :style="`--tw-rotate: ${(idx) * minTomatoDeg()}deg`">
         {{ num }}
       </div>
     </div>
-    <div ref="minText" class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
-      <div class="relative left-[320%] <lg:left-[280%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? minuteOrMinutes : "分鐘" }}</div>
+    <div ref="minText"
+      class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
+      <div
+        class="relative left-[320%] <lg:left-[280%] top-[50%] select-none dark:text-gray-600 transform -translate-y-[50%]">
+        {{ lang ===
+          "en" ? minuteOrMinutes : "分鐘" }}</div>
     </div>
 
     <!-- Second -->
     <div ref="secDial"
-      class="absolute -z-10 left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
+      class="absolute z-5 left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
       <div v-for="(num, idx) in zeroToSixty" :key="idx"
         class="absolute left-[50%] top-[50%] w-110 <lg:w-99 text-gray-300 text-right select-none transition transform -translate-y-[50%] origin-left rotate-6"
         :class="isSecondDivAcitve(idx) ? 'font-bold text-black dark:text-gray-200' : 'text-gray-200 dark:text-gray-600'"
@@ -101,28 +121,44 @@
         {{ num }}
       </div>
     </div>
-    <div ref="secText" class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
-      <div class="relative left-[502%] <lg:left-[450%] top-[50%] select-none transform -translate-y-[50%]">{{ lang === "en" ? secondOrSeconds : "秒鐘" }}</div>
+    <div ref="secText"
+      class="absolute left-[50vw] top-[50vh] w-100px h-100px transform -translate-x-[50%] -translate-y-[50%]">
+      <div
+        class="relative left-[502%] <lg:left-[450%] top-[50%] select-none dark:text-gray-600 transform -translate-y-[50%]">
+        {{ lang ===
+          "en" ? secondOrSeconds : "秒鐘" }}</div>
     </div>
 
     <!-- note -->
     <Transition>
-      <V1Release ref="v1Note" v-show="isNoteShow" class="absolute bg-light-100 right-[8rem] top-[50vh] transform -translate-y-[50%]"
-        :minString="formatCountdown().min" :secString="formatCountdown().sec"
-      />
+      <V1Release ref="v1Note" v-show="isNoteShow"
+        class="absolute z-15 bg-light-100 right-[8rem] top-[50vh] transform -translate-y-[50%] dark:(text-gray-200 bg-dark-600)"
+        :minString="formatCountdown().min" :secString="formatCountdown().sec" />
     </Transition>
   </div>
 </template>
 
 <script setup lang='ts'>
-import { gsap } from "gsap"
+import { gsap, } from "gsap"
+import { Draggable } from "gsap/all";
+gsap.registerPlugin(Draggable)
+
+// color mode
+const colorMode = useColorMode()
+const switchColorMode = () => {
+  if (colorMode.value === "light") {
+    colorMode.preference = "dark"
+  } else {
+    colorMode.preference = "light"
+  }
+}
 
 // Tomatos
 const TOMATO = ref(25)
 const tomatoNum = ref(1)
 const totalMs = TOMATO.value * tomatoNum.value * 60 * 1000
 
-// Dial Array
+// Numbers
 const lang = ref("en")
 const zeroToSixty = computed(() => {
   if (lang.value == "en") {
@@ -146,21 +182,22 @@ const zeroToSixty = computed(() => {
   }
 })
 
-// Refs and degrees
+// Refs
 const knob = ref()
 const minText = ref()
 const secText = ref()
 const minDial = ref()
-const minDeg = 6
-const minTomatoDeg = () => 360/(TOMATO.value+1)
 const secDial = ref()
+const v1Note = ref()
+
+// Degrees
+const minDeg = 6
+const minTomatoDeg = () => 360 / (TOMATO.value + 1)
 const secDeg = 6
 // Record the offset of the sec dial after reset
 // Each time after the reset button pressed,
 // sec dial won't go all the way back, but only back to the nearest zero tick.
 const secDeltaDeg = ref(0)
-
-const v1Note = ref()
 
 // timer state
 const isCounting = ref(false)
@@ -233,7 +270,7 @@ const rDial = (dialRef: Ref, degrees: number, d: number, ease = "power1.out") =>
 }
 
 const isSecondDivAcitve = (idx: number) => (elapseSec.value === 0) ? idx === 0 : idx === (60 - elapseSec.value)
-const isMinuteDivActive = (idx: number) => (elapseMin.value === 0) ? idx === 0 : idx === (TOMATO.value +1 - elapseMin.value)
+const isMinuteDivActive = (idx: number) => (elapseMin.value === 0) ? idx === 0 : idx === (TOMATO.value + 1 - elapseMin.value)
 
 
 // Timer Functions
@@ -349,9 +386,36 @@ const switchFocus = () => {
 }
 
 
+const escDown = () => {
+  if (isNoteShow.value || isFocus.value) {
+    switchFocus()
+    console.log("esc")
+  }
+}
+
 
 onMounted(() => {
   // gsap.registerPlugin(Draggable)
+  Draggable.create(minDial.value, {
+    type: "rotation",
+    inertia: true,
+    liveSnap: {
+      rotation: function (value) {
+        return Math.round(value / minTomatoDeg()) * minTomatoDeg()
+      }
+    }
+  });
+
+  Draggable.create(secDial.value, {
+    type: "rotation",
+    inertia: true,
+    liveSnap: {
+      rotation: function (value) {
+        return Math.round(value / secDeg) * secDeg
+      }
+    }
+  });
+
   const timerRefGroup = [
     knob.value,
     minDial.value, minText.value,
@@ -385,16 +449,28 @@ onMounted(() => {
   box-shadow: 0 0 34px 6px rgba(46, 210, 9, 0.25)
 }
 
+.dark .shadow-xlc-green:hover {
+  box-shadow: 0 0 34px 6px rgba(96, 255, 165, 0.7)
+}
+
 .shadow-xlc-red {
   box-shadow: 0 0 34px 6px rgba(210, 9, 9, 0.2)
+}
+
+.dark .shadow-xlc-red {
+  box-shadow: 0 0 34px 6px rgba(244, 85, 85, 0.7)
 }
 
 .shadow-xlc-orange {
   box-shadow: 0 0 34px 6px rgba(255, 204, 35, 0.2)
 }
 
-.v-enter-active
-{
+.dark .shadow-xlc-orange {
+  box-shadow: 0 0 34px 6px rgba(255, 204, 118, 0.7)
+}
+
+
+.v-enter-active {
   transition: opacity 0.6s ease;
   transition-delay: 100ms;
 }
@@ -406,5 +482,4 @@ onMounted(() => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
-}
-</style>
+}</style>
