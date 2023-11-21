@@ -68,7 +68,7 @@
     <!-- Knob -->
     <div ref="knob" class="absolute z-15 left-[50vw] top-[50vh]
       flex flex-col justify-center items-center
-      border rounded-1
+      border rounded-1 dark:(border-none) shadow-xlc-white
       w-200px h-200px
       transform -translate-x-[50%] -translate-y-[50%] transition-shadow"
       :class="[isTomato ? 'shadow-xlc-red' : isPause ? 'shadow-xlc-orange' : 'shadow-xlc-green']">
@@ -467,6 +467,10 @@ onMounted(() => {
 
 .dark .shadow-xlc-orange {
   box-shadow: 0 0 34px 6px rgba(255, 204, 118, 0.7)
+}
+
+.shadow-xlc-white {
+  box-shadow: 0 0 35px 6px rgba(255, 255, 255, 0.25)
 }
 
 
