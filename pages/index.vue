@@ -30,7 +30,7 @@
         </NuxtLink>
       </RoundBtn>
       <RoundBtn :isActivated="false">
-        <NuxtLink to="https://tyyuan110.com" target="_blank">
+        <NuxtLink to="https://tyyuan.me" target="_blank">
           <Icon name="uil:user" class="text-md dark:text-600" />
         </NuxtLink>
       </RoundBtn>
